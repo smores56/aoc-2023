@@ -28,7 +28,7 @@ part2 = \lines ->
 ```
 
 There are 3 other places where you'll need to add code for hooking up the new day's solutions:
-- Add `DayX` to the `exposes` clause of the `Days/main.roc` package declaration
+- Add `DayX` to the `exposes` clause of the `days/main.roc` package declaration
 - Add a `days.DayX` import to the top of `main.roc`
 - Add a `X -> Ok (DayX.part1, DayX.part2)` case to the `solutionsForDay` function
 

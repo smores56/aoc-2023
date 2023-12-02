@@ -25,16 +25,17 @@ firstAndLastNumberOnLine = \line, findDigits ->
     firstDigit * 10 + lastDigit
 
 digitsWordOrNumber = \chars ->
-    indices = List.range { start: At 0, end: Before (List.len chars) }
-    List.keepOks indices \index ->
-        firstDigit = List.get chars index |> Result.try Str.toNat
+    startingIndices = List.range { start: At 0, end: Before (List.len chars) }
+    List.keepOks startingIndices \index ->
+        firstDigit =
+            List.get chars index
+            |> Result.try Str.toNat
+
         when firstDigit is
             Ok digit -> Ok digit
             Err _ ->
-                List.findFirstIndex digitNames \name ->
-                    nameChars = Str.graphemes name
-                    nameIndices = List.range { start: At 0, end: Before (Str.countGraphemes name) }
-                    List.all nameIndices \ni -> List.get nameChars ni == List.get chars (index + ni)
+                rest = List.dropFirst chars index |> Str.joinWith ""
+                List.findFirstIndex digitNames \name -> Str.startsWith rest name
 
 part1 = \lines ->
     numbers = List.map lines \line ->
