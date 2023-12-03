@@ -12,6 +12,7 @@ app "aoc-2023"
         pf.Utc,
         days.Day1,
         days.Day2,
+        days.Day3,
     ]
     provides [main] to pf
 
@@ -75,6 +76,7 @@ solutionsForDay = \day ->
     when day is
         1 -> Ok (Day1.part1, Day1.part2)
         2 -> Ok (Day2.part1, Day2.part2)
+        3 -> Ok (Day3.part1, Day3.part2)
         _ -> Err (DayNotImplemented day)
 
 inputCacheDir = ".input"

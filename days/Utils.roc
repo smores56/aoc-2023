@@ -31,4 +31,3 @@ parseNat = \text ->
         Ok (total, dropGraphemes text (List.len digits))
     else
         Err ParseError
-
