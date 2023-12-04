@@ -13,6 +13,7 @@ app "aoc-2023"
         days.Day1,
         days.Day2,
         days.Day3,
+        days.Day4,
     ]
     provides [main] to pf
 
@@ -31,7 +32,7 @@ main =
                     MissingDayArg -> "You must pass a day of the month to run solutions for"
                     MissingSessionToken -> "You have not saved your session token to .session, check the README for directions"
                     FailedToCacheInput -> "Failed to save loaded input to cache"
-                    FailedToCreateCacheDir -> "Failed to create \(inputCacheDir) "
+                    FailedToCreateCacheDir -> "Failed to create \(inputCacheDir) cache directory"
                     FailedToFetchInput httpErr ->
                         "Failed to fetch input from the Advent of Code site: \(Http.errorToString httpErr)"
 
@@ -77,6 +78,7 @@ solutionsForDay = \day ->
         1 -> Ok (Day1.part1, Day1.part2)
         2 -> Ok (Day2.part1, Day2.part2)
         3 -> Ok (Day3.part1, Day3.part2)
+        4 -> Ok (Day4.part1, Day4.part2)
         _ -> Err (DayNotImplemented day)
 
 inputCacheDir = ".input"
