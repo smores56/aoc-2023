@@ -1,4 +1,4 @@
-interface Day4
+interface Day04
     exposes [part1, part2]
     imports []
 

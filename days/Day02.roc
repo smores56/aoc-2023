@@ -1,4 +1,4 @@
-interface Day2
+interface Day02
     exposes [part1, part2]
     imports [Utils.{ parseLiteral, parseNat }]
 

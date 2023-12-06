@@ -1,4 +1,4 @@
-interface Day3
+interface Day03
     exposes [part1, part2]
     imports [Grid]
 

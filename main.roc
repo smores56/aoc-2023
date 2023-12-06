@@ -1,5 +1,5 @@
 app "aoc-2023"
-    packages { days: "days/main.roc", pf: "https://github.com/roc-lang/basic-cli/releases/download/0.6.2/c7T4Hp8bAdWz3r9ZrhboBzibCjJag8d0IP_ljb42yVc.tar.br" }
+    packages { days: "days/main.roc", pf: "https://github.com/roc-lang/basic-cli/releases/download/0.7.0/bkGby8jb0tmZYsy2hg1E_B2QrCgcSTxdUlHtETwm5m4.tar.br" }
     imports [
         pf.Stdout,
         pf.Stderr,
@@ -10,10 +10,12 @@ app "aoc-2023"
         pf.Dir,
         pf.Arg,
         pf.Utc,
-        days.Day1,
-        days.Day2,
-        days.Day3,
-        days.Day4,
+        days.Day01,
+        days.Day02,
+        days.Day03,
+        days.Day04,
+        days.Day05,
+        days.Day06,
     ]
     provides [main] to pf
 
@@ -75,10 +77,12 @@ getDayFromArgs =
 
 solutionsForDay = \day ->
     when day is
-        1 -> Ok (Day1.part1, Day1.part2)
-        2 -> Ok (Day2.part1, Day2.part2)
-        3 -> Ok (Day3.part1, Day3.part2)
-        4 -> Ok (Day4.part1, Day4.part2)
+        1 -> Ok (Day01.part1, Day01.part2)
+        2 -> Ok (Day02.part1, Day02.part2)
+        3 -> Ok (Day03.part1, Day03.part2)
+        4 -> Ok (Day04.part1, Day04.part2)
+        5 -> Ok (Day05.part1, Day05.part2)
+        6 -> Ok (Day06.part1, Day06.part2)
         _ -> Err (DayNotImplemented day)
 
 inputCacheDir = ".input"

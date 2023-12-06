@@ -1,3 +1,10 @@
 package "Days"
-    exposes [Day1, Day2, Day3, Day4]
+    exposes [
+        Day01,
+        Day02,
+        Day03,
+        Day04,
+        Day05,
+        Day06,
+    ]
     packages {}

@@ -16,7 +16,7 @@ Inputs are automatically loaded from the Advent of Code website and cached in th
 Solutions for each day live in the `days` folder, each called `DayX.roc`. You can copy this template to kickstart a day's solutions off:
 
 ```elm
-interface DayX
+interface DayXX
     exposes [part1, part2]
     imports []
 
@@ -28,9 +28,9 @@ part2 = \lines ->
 ```
 
 There are 3 other places where you'll need to add code for hooking up the new day's solutions:
-- Add `DayX` to the `exposes` clause of the `days/main.roc` package declaration
-- Add a `days.DayX` import to the top of `main.roc`
-- Add a `X -> Ok (DayX.part1, DayX.part2)` case to the `solutionsForDay` function
+- Add `DayXX` to the `exposes` clause of the `days/main.roc` package declaration
+- Add a `days.DayXX` import to the top of `main.roc`
+- Add a `XX -> Ok (DayXX.part1, DayXX.part2)` case to the `solutionsForDay` function
 
 ## Running
 
