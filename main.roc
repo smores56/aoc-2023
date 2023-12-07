@@ -16,32 +16,31 @@ app "aoc-2023"
         days.Day04,
         days.Day05,
         days.Day06,
+        days.Day07,
     ]
     provides [main] to pf
 
 aocYear = 2023
 
 main =
-    result <- Task.attempt findSolutionsForDay
+    error <- getDayFromArgs
+        |> Task.await findSolutionsForDay
+        |> Task.onErr
 
-    when result is
-        Ok {} -> Task.ok {}
-        Err err ->
-            message =
-                when err is
-                    DayNotImplemented day -> "Day \(Num.toStr day) has not been implemented yet"
-                    InvalidDayArg -> "The day argument must be a positive integer"
-                    MissingDayArg -> "You must pass a day of the month to run solutions for"
-                    MissingSessionToken -> "You have not saved your session token to .session, check the README for directions"
-                    FailedToCacheInput -> "Failed to save loaded input to cache"
-                    FailedToCreateCacheDir -> "Failed to create \(inputCacheDir) cache directory"
-                    FailedToFetchInput httpErr ->
-                        "Failed to fetch input from the Advent of Code site: \(Http.errorToString httpErr)"
+    message =
+        when error is
+            DayNotImplemented day -> "Day \(Num.toStr day) has not been implemented yet"
+            InvalidDayArg -> "The day argument must be a positive integer"
+            MissingDayArg -> "You must pass a day of the month to run solutions for"
+            MissingSessionToken -> "You have not saved your session token to .session, check the README for directions"
+            FailedToCacheInput -> "Failed to save loaded input to cache"
+            FailedToCreateCacheDir -> "Failed to create \(inputCacheDir) cache directory"
+            FailedToFetchInput httpErr ->
+                "Failed to fetch input from the Advent of Code site: \(Http.errorToString httpErr)"
 
-            Stderr.line message
+    Stderr.line message
 
-findSolutionsForDay =
-    day <- getDayFromArgs |> Task.await
+findSolutionsForDay = \day ->
     _ <- Stdout.line "Advent of Code \(Num.toStr aocYear) solutions for day \(Num.toStr day):" |> Task.await
 
     inputLines <- loadInput day |> Task.await
@@ -60,6 +59,17 @@ runSolutionForPart = \input, solution, part ->
 
     Stdout.line "Result for part \(Num.toStr part) in \(Num.toStr milliseconds)ms: \(partAnswer)"
 
+solutionsForDay = \day ->
+    when day is
+        01 -> Ok (Day01.part1, Day01.part2)
+        02 -> Ok (Day02.part1, Day02.part2)
+        03 -> Ok (Day03.part1, Day03.part2)
+        04 -> Ok (Day04.part1, Day04.part2)
+        05 -> Ok (Day05.part1, Day05.part2)
+        06 -> Ok (Day06.part1, Day06.part2)
+        07 -> Ok (Day07.part1, Day07.part2)
+        _ -> Err (DayNotImplemented day)
+
 getDayFromArgs =
     args <- Arg.list
         |> Task.mapErr (\_ -> MissingDayArg)
@@ -74,16 +84,6 @@ getDayFromArgs =
         Ok day -> Task.ok day
         Err InvalidNumStr -> Task.err InvalidDayArg
         Err OutOfBounds -> Task.err MissingDayArg
-
-solutionsForDay = \day ->
-    when day is
-        1 -> Ok (Day01.part1, Day01.part2)
-        2 -> Ok (Day02.part1, Day02.part2)
-        3 -> Ok (Day03.part1, Day03.part2)
-        4 -> Ok (Day04.part1, Day04.part2)
-        5 -> Ok (Day05.part1, Day05.part2)
-        6 -> Ok (Day06.part1, Day06.part2)
-        _ -> Err (DayNotImplemented day)
 
 inputCacheDir = ".input"
 

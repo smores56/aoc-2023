@@ -21,10 +21,10 @@ interface DayXX
     imports []
 
 part1 = \lines ->
-  "TODO"
+    "TODO"
 
 part2 = \lines ->
-  "TODO"
+    "TODO"
 ```
 
 There are 3 other places where you'll need to add code for hooking up the new day's solutions:
