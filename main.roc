@@ -17,12 +17,14 @@ app "aoc-2023"
         days.Day05,
         days.Day06,
         days.Day07,
+        days.Day08,
     ]
     provides [main] to pf
 
 aocYear = 2023
 
 main =
+    # error <- findSolutionsForDay DAY |> Task.onErr
     error <- getDayFromArgs
         |> Task.await findSolutionsForDay
         |> Task.onErr
@@ -68,6 +70,7 @@ solutionsForDay = \day ->
         05 -> Ok (Day05.part1, Day05.part2)
         06 -> Ok (Day06.part1, Day06.part2)
         07 -> Ok (Day07.part1, Day07.part2)
+        08 -> Ok (Day08.part1, Day08.part2)
         _ -> Err (DayNotImplemented day)
 
 getDayFromArgs =
