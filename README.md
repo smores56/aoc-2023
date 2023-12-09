@@ -27,8 +27,7 @@ part2 = \lines ->
     "TODO"
 ```
 
-There are 3 other places where you'll need to add code for hooking up the new day's solutions:
-- Add `DayXX` to the `exposes` clause of the `days/main.roc` package declaration
+There are two other places where you'll need to add code for hooking up the new day's solutions:
 - Add a `days.DayXX` import to the top of `main.roc`
 - Add a `XX -> Ok (DayXX.part1, DayXX.part2)` case to the `solutionsForDay` function
 
