@@ -1,21 +1,15 @@
 interface Grid
     exposes [
         Grid,
-        Coordinates,
         get,
         walk,
+        find,
         heightAndWidth,
-        coordinateNeighbors,
-        neighborCoordinates,
+        neighbors,
     ]
-    imports []
+    imports [Coordinates]
 
 Grid a : List (List a)
-
-Coordinates : {
-    row : Nat,
-    column : Nat,
-}
 
 get = \grid, coords ->
     grid
@@ -29,6 +23,13 @@ walk = \grid, startingState, accumulator ->
             coordinates = { row: rowIndex, column: columnIndex }
             accumulator state cell coordinates
 
+find = \grid, predicate ->
+    walk grid NotFound \wasFound, cell, coordinates ->
+        if predicate cell && wasFound == NotFound then
+            Found cell coordinates
+        else
+            wasFound
+
 heightAndWidth = \grid ->
     height = List.len grid
     width =
@@ -38,21 +39,8 @@ heightAndWidth = \grid ->
 
     (height, width)
 
-coordinateNeighbors = \{ row, column } ->
-    candidates = [
-        if row > 0 then Ok { row: row - 1, column } else Err OutOfBounds,
-        if row > 0 then Ok { row: row - 1, column: column + 1 } else Err OutOfBounds,
-        Ok { row, column: column + 1 },
-        Ok { row: row + 1, column: column + 1 },
-        Ok { row: row + 1, column },
-        if column > 0 then Ok { row: row + 1, column: column - 1 } else Err OutOfBounds,
-        if column > 0 then Ok { row, column: column - 1 } else Err OutOfBounds,
-        if row > 0 && column > 0 then Ok { row: row - 1, column: column - 1 } else Err OutOfBounds,
-    ]
-
-    List.keepOks candidates \c -> c
-
-neighborCoordinates = \grid, coords ->
-    coordinateNeighbors coords
+neighbors = \grid, coords ->
+    Coordinates.neighbors coords
     |> List.keepOks \neighbor ->
-        get grid neighbor |> Result.map \_ -> neighbor
+        get grid neighbor
+        |> Result.map \n -> (n, coords)

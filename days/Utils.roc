@@ -1,5 +1,5 @@
 interface Utils
-    exposes [dropGraphemes, parseLiteral, parseNat]
+    exposes [dropGraphemes, parseLiteral, parseNat, lowerAndHigher]
     imports []
 
 dropGraphemes = \s, amount ->
@@ -31,3 +31,6 @@ parseNat = \text ->
         Ok (total, dropGraphemes text (List.len digits))
     else
         Err ParseError
+
+lowerAndHigher = \a, b ->
+    if a < b then (a, b) else (b, a)
