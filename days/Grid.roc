@@ -2,6 +2,9 @@ interface Grid
     exposes [
         Grid,
         get,
+        getRow,
+        getColumn,
+        update,
         walk,
         find,
         heightAndWidth,
@@ -16,6 +19,17 @@ get = \grid, coords ->
     |> List.get coords.row
     |> Result.try \row ->
         List.get row coords.column
+
+getRow = \grid, rowIndex ->
+    List.get grid rowIndex
+
+getColumn = \grid, columnIndex ->
+    List.mapTry grid \row -> List.get row columnIndex
+
+update = \grid, coords, updater ->
+    grid
+    |> List.update coords.row \row ->
+        row |> List.update coords.column updater
 
 walk = \grid, startingState, accumulator ->
     List.walkWithIndex grid startingState \rowState, row, rowIndex ->
