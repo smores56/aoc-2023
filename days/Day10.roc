@@ -9,6 +9,8 @@ reverseDirection = \direction ->
         Left -> Right
         Right -> Left
 
+allDirections = [Up, Down, Left, Right]
+
 directionsPipesFace =
     Dict.empty {}
     |> Dict.insert "|" [Up, Down]
@@ -26,13 +28,22 @@ deltaForDirection = \direction ->
         Left -> { row: 0, column: -1 }
         Right -> { row: 0, column: 1 }
 
+getNeighbor = \pipes, coords, inDirection ->
+    delta = deltaForDirection inDirection
+    neighborCoords <- Coordinates.add coords delta
+        |> Result.try
+    neighborDirections <- Grid.get pipes neighborCoords
+        |> Result.map
+
+    { inDirection, coords: neighborCoords, directions: neighborDirections }
+
 parseInput = \lines ->
     charGrid = List.map lines Str.graphemes
     pipes = parsePipes charGrid
 
     when Grid.find charGrid \c -> c == "S" is
         NotFound -> Err MissingStartPosition
-        Found _startChar startingCoords -> Ok { pipes, startingCoords }
+        Found _startChar startingCoords -> Ok (pipes, startingCoords)
 
 parsePipes = \charGrid ->
     List.map charGrid \chars ->
@@ -76,81 +87,97 @@ searchPipesBreadthFirst = \pipes, startingCoords ->
 
     inner [(startingCoords, 0)] (Dict.empty {})
 
-# coordColors = \pipes, allPipeCoords ->
-#     inner = \queue, colors ->
-#         when List.first queue is
-#             Err _ -> colors
-#             Ok (coords, color) ->
-#                 directionsFaced = Grid.get pipes coords
-#                     |> Result.withDefault []
-#                 unvisitedNeighbors =
-#                     [Up, Down, Left, Right]
-#                     |> List.keepOks \direction ->
-#                         delta = deltaForDirection direction
-#                         neighborCoords <- Coordinates.add coords delta
-#                             |> Result.try
-#                         neighborDirections <- Grid.get pipes neighborCoords
-#                             |> Result.map
+coordColors = \pipes, allPipeCoords ->
+    compareColors = \(_, leftColor), (_, rightColor) ->
+        when (leftColor, rightColor) is
+            (HasColor _, NoColor _) -> LT
+            (NoColor _, HasColor _) -> GT
+            (HasColor l, HasColor r) -> Num.compare l r
+            (NoColor l, NoColor r) -> Num.compare l r
 
-#                         newColor = if List.isEmpty neighborDirections then
-#                             when color is
-#                                 HasColor currentColor -> HasColor currentColor
-#                                 NoColor prevColor -> HasColor (prevColor + 1)
-#                         else
-#                             otherWay = reverseDirection direction
-#                             # if List.contains allPipeCoords c then
-#                             # else
-#                             #     Err Whoops
-#                             when color is
-#                                 HasColor currentColor -> NoColor currentColor
-#                                 NoColor prevColor ->
-#                                     # connected
-#                                     if List.contains neighborDirections otherWay then
-#                                         HasColor 1
-#                                     else
-#                                         123
+    inner = \queue, colors ->
+        when List.first queue is
+            Err _ -> colors
+            Ok (coords, color) ->
+                unvisitedNeighbors =
+                    allDirections
+                    |> List.keepOks \direction -> getNeighbor pipes coords direction
+                    |> List.map \neighbor ->
+                        neighborIsEmpty = !(List.contains allPipeCoords neighbor.coords)
+                        newColor =
+                            when color is
+                                HasColor currentColor if neighborIsEmpty -> HasColor currentColor
+                                NoColor prevColor if neighborIsEmpty -> HasColor (prevColor + 1)
+                                HasColor currentColor -> NoColor currentColor
+                                NoColor prevColor ->
+                                    otherWay = reverseDirection neighbor.inDirection
+                                    if List.contains neighbor.directions otherWay then
+                                        NoColor prevColor
+                                    else
+                                        NoColor (prevColor + 1)
 
-#                         (neighborCoords, newColor)
-#                     |> List.dropIf \(_neighbor, neighborCoords) ->
-#                         Dict.contains colors neighborCoords
+                        (neighbor.coords, newColor)
+                    |> List.dropIf \(neighborCoords, neighborColor) ->
+                        Dict.contains colors neighborCoords || List.contains queue (neighborCoords, neighborColor)
 
-#                 updatedQueue = queue
-#                     |> List.dropFirst 1
-#                     |> List.concat unvisitedNeighbors
-#                 updatedColors = colors
-#                     |> Dict.insert coords color
+                updatedQueue =
+                    queue
+                    |> List.dropFirst 1
+                    |> List.concat unvisitedNeighbors
+                    |> List.sortWith compareColors
+                updatedColors =
+                    colors
+                    |> Dict.insert coords color
 
-#                 inner updatedQueue updatedColors
+                inner updatedQueue updatedColors
 
-#     inner [({ row: 0, column: 0 }, HasColor 0)] (Dict.empty {})
+    startingCoords = { row: 0, column: 0 }
+    startingColor = if List.contains allPipeCoords startingCoords then NoColor 0 else HasColor 0
 
-part1 = \lines ->
-    { pipes, startingCoords } =
-        parseInput lines
-        |> Result.withDefault { pipes: [], startingCoords: { row: 0, column: 0 } }
+    inner [(startingCoords, startingColor)] (Dict.empty {})
 
-    visitedDistances = searchPipesBreadthFirst pipes startingCoords
-
-    visitedDistances
-    |> Dict.values
-    |> List.max
-    |> Result.withDefault 0
-    |> Num.toStr
-
-part2 = \_lines ->
-    # { pipes, startingCoords } =
-    #     parseInput lines
-    #     |> Result.withDefault { pipes: [], startingCoords: { row: 0, column: 0 } }
+part1 = \_lines ->
+    # (pipes, startingCoords) =
+    #     parseInput lines |> Result.withDefault ([], { row: 0, column: 0 })
 
     # visitedDistances = searchPipesBreadthFirst pipes startingCoords
-    # allPipeCoords = Dict.keys visitedDistances
 
-    # coordColors pipes allPipeCoords
+    # visitedDistances
     # |> Dict.values
-    # |> List.countIf \color ->
-    #     when color is
-    #         HasColor c -> c % 2 == 1
-    #         NoColor _prevColor -> Bool.false
+    # |> List.max
+    # |> Result.withDefault 0
     # |> Num.toStr
 
     "TODO"
+
+part2 = \lines ->
+    (pipes, startingCoords) =
+        parseInput lines |> Result.withDefault ([], { row: 0, column: 0 })
+
+    visitedDistances = searchPipesBreadthFirst pipes startingCoords
+    allPipeCoords = Dict.keys visitedDistances
+
+    coordColors pipes allPipeCoords
+    |> Dict.values
+    |> List.countIf \color ->
+        when color is
+            HasColor c -> c % 2 == 1
+            NoColor _prevColor -> Bool.false
+    |> Num.toStr
+
+# coordColors pipes allPipeCoords
+# |> Dict.keepIf \(_coords, color) ->
+#     when color is
+#         HasColor c -> c % 2 == 1
+#         NoColor _prevColor -> Bool.false
+# |> Inspect.toStr
+
+# ...........
+# .S-------7.
+# .|F-----7|.
+# .||.....||.
+# .||.....||.
+# .|L-7.F-J|.
+# .|..|.|..|.
+# .L--J.L--J.
+# ...........
