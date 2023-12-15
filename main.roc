@@ -24,6 +24,7 @@ app "aoc-2023"
         days.Day12,
         days.Day13,
         days.Day14,
+        days.Day15,
     ]
     provides [main] to pf
 
@@ -83,6 +84,7 @@ solutionsForDay = \day ->
         12 -> Ok (Day12.part1, Day12.part2)
         13 -> Ok (Day13.part1, Day13.part2)
         14 -> Ok (Day14.part1, Day14.part2)
+        15 -> Ok (Day15.part1, Day15.part2)
         _ -> Err (DayNotImplemented day)
 
 getDayFromArgs =
