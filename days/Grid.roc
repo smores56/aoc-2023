@@ -1,6 +1,7 @@
 interface Grid
     exposes [
         Grid,
+        GridCell,
         get,
         getRow,
         getColumn,
@@ -9,10 +10,18 @@ interface Grid
         find,
         heightAndWidth,
         neighbors,
+        AStarCell,
+        AStarNeighbor,
+        aStarSearchDistance,
     ]
     imports [Coordinates]
 
 Grid a : List (List a)
+
+GridCell a : {
+    value : a,
+    coords : Coordinates.Coordinates,
+}
 
 get = \grid, coords ->
     grid
@@ -57,4 +66,67 @@ neighbors = \grid, coords ->
     Coordinates.neighbors coords
     |> List.keepOks \neighbor ->
         get grid neighbor
-        |> Result.map \n -> (n, coords)
+        |> Result.map \n -> (n, neighbor)
+
+AStarCell a : GridCell
+    {
+        g : Nat,
+        h : Nat,
+        f : Nat,
+    }
+    a
+
+AStarNeighbor a : GridCell
+    {
+        distance : Nat,
+    }
+    a
+
+AStarSearchDistanceParams a b : {
+    grid : Grid a,
+    start : GridCell b,
+    goal : Coordinates.Coordinates,
+    heuristic :
+    {
+        grid : Grid a,
+        cell : GridCell b,
+        goal : Coordinates.Coordinates,
+    }
+    -> Nat,
+    getNeighbors : Grid a, GridCell b -> List (AStarNeighbor b),
+}
+
+aStarSearchDistance : AStarSearchDistanceParams a b -> Result Nat [NoPathFound] where b implements Bool.Eq & Hash.Hash
+aStarSearchDistance = \{ grid, start, goal, heuristic, getNeighbors } ->
+    inner = \queue, visited ->
+        current <- List.first queue
+            |> Result.mapErr \_ -> NoPathFound
+            |> Result.try
+
+        if current.coords == goal then
+            Ok current.g
+        else
+            nextNeighbors =
+                getNeighbors grid { coords: current.coords, value: current.value }
+                |> List.dropIf \neighbor -> Set.contains visited (neighbor.coords, neighbor.value)
+                |> List.map \neighbor ->
+                    neighborG = current.g + neighbor.distance
+                    neighborH = heuristic { grid, cell: { coords: neighbor.coords, value: neighbor.value }, goal }
+
+                    {
+                        value: neighbor.value,
+                        coords: neighbor.coords,
+                        g: neighborG,
+                        h: neighborH,
+                        f: neighborG + neighborH,
+                    }
+
+            updatedVisited = Set.insert visited (current.coords, current.value)
+            updatedQueue =
+                List.dropFirst queue 1
+                |> List.concat nextNeighbors
+                |> List.sortWith \a, b -> Num.compare a.f b.f
+
+            inner updatedQueue updatedVisited
+
+    inner [{ coords: start.coords, value: start.value, g: 0, h: 0, f: 0 }] (Set.empty {})
