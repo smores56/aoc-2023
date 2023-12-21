@@ -11,7 +11,7 @@ parseCityBlock = \lines ->
     |> List.dropIf List.isEmpty
 
 getNeighbors = \cityBlock, value, coords ->
-    Grid.neighbors cityBlock coords
+    Grid.cardinalNeighbors cityBlock coords
     |> List.map \(neighbor, neighborCoords) ->
         { value: (neighbor, 0), coords: neighborCoords, distance: neighbor }
     |> List.dropIf \neighbor ->
@@ -25,22 +25,24 @@ approximateDistance = \{ grid: _cityBlock, value: _value, coords, goal } ->
 
     9 * (higherRow - lowerRow + higherColumn - lowerColumn)
 
-part1 = \lines ->
-    cityBlock = parseCityBlock lines
-    (height, width) = Grid.heightAndWidth cityBlock
+part1 = \_lines ->
+    # cityBlock = parseCityBlock lines
+    # (height, width) = Grid.heightAndWidth cityBlock
 
-    minHeatLoss = Grid.aStarSearchDistance {
-        grid: cityBlock,
-        start: { row: 0, column: 0 },
-        goal: { row: height - 1, column: width - 1 },
-        initialValue: (0, 0),
-        getNeighbors,
-        heuristic: approximateDistance,
-    }
+    # minHeatLoss = Grid.aStarSearchDistance {
+    #     grid: cityBlock,
+    #     start: { row: 0, column: 0 },
+    #     goal: { row: height - 1, column: width - 1 },
+    #     initialValue: (0, 0),
+    #     getNeighbors,
+    #     heuristic: approximateDistance,
+    # }
 
-    when minHeatLoss is
-        Ok heatLoss -> Num.toStr heatLoss
-        Err err -> "No path to goal found: \(Inspect.toStr err)"
+    # when minHeatLoss is
+    #     Ok heatLoss -> Num.toStr heatLoss
+    #     Err err -> "No path to goal found: \(Inspect.toStr err)"
+
+    "TODO"
 
 part2 = \_lines ->
     "TODO"

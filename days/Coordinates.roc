@@ -2,7 +2,8 @@ interface Coordinates
     exposes [
         Coordinates,
         add,
-        neighbors,
+        allNeighbors,
+        cardinalNeighbors,
     ]
     imports []
 
@@ -20,17 +21,26 @@ add = \coords, delta ->
     else
         Err OutOfBounds
 
-neighbors = \coords ->
-    deltas = [
-        { row: -1, column: 0 },
-        { row: -1, column: 1 },
-        { row: 0, column: 1 },
-        { row: 1, column: 1 },
-        { row: 1, column: 0 },
-        { row: 1, column: -1 },
-        { row: 0, column: -1 },
-        { row: -1, column: -1 },
-    ]
-
-    List.keepOks deltas \delta ->
+allNeighbors = \coords ->
+    List.keepOks allDeltas \delta ->
         add coords delta
+
+cardinalNeighbors = \coords ->
+    List.keepOks cardinalDeltas \delta ->
+        add coords delta
+
+allDeltas = List.concat cardinalDeltas diagonalDeltas
+
+cardinalDeltas = [
+    { row: -1, column: 0 },
+    { row: 0, column: 1 },
+    { row: 1, column: 0 },
+    { row: 0, column: -1 },
+]
+
+diagonalDeltas = [
+    { row: -1, column: 1 },
+    { row: 1, column: 1 },
+    { row: 1, column: -1 },
+    { row: -1, column: -1 },
+]

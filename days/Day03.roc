@@ -45,7 +45,7 @@ part1 = \lines ->
         |> List.map \(_symbol, coords) -> coords
         |> Set.fromList
     symbolNeighbors = Set.joinMap allSymbolCoords \coords ->
-        Grid.neighbors grid coords
+        Grid.allNeighbors grid coords
         |> List.map .1
         |> Set.fromList
 
@@ -74,7 +74,7 @@ part2 = \lines ->
         allGearCandidates
         |> List.keepOks \gearCoords ->
             allNeighborCoords =
-                Grid.neighbors grid gearCoords
+                Grid.allNeighbors grid gearCoords
                 |> List.map .1
             neighborNums = List.keepOks schematic.numbers \(number, allDigitCoords) ->
                 numIsNeighborOfGear = List.any allNeighborCoords \neighborCoords ->

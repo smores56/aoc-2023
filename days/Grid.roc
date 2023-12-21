@@ -8,7 +8,8 @@ interface Grid
         walk,
         find,
         heightAndWidth,
-        neighbors,
+        allNeighbors,
+        cardinalNeighbors,
         AStarCell,
         AStarNeighbor,
         aStarSearchDistance,
@@ -56,8 +57,14 @@ heightAndWidth = \grid ->
 
     (height, width)
 
-neighbors = \grid, coords ->
-    Coordinates.neighbors coords
+allNeighbors = \grid, coords ->
+    Coordinates.allNeighbors coords
+    |> List.keepOks \neighbor ->
+        get grid neighbor
+        |> Result.map \n -> (n, neighbor)
+
+cardinalNeighbors = \grid, coords ->
+    Coordinates.cardinalNeighbors coords
     |> List.keepOks \neighbor ->
         get grid neighbor
         |> Result.map \n -> (n, neighbor)
