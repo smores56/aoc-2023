@@ -14,7 +14,7 @@ interface Grid
         AStarNeighbor,
         aStarSearchDistance,
     ]
-    imports [Coordinates]
+    imports [Coordinates, MinHeap]
 
 Grid a : List (List a)
 
@@ -95,7 +95,7 @@ aStarSearchDistance :
     -> Result Nat [NoPathFound]
 aStarSearchDistance = \{ grid, start, goal, initialValue, heuristic, getNeighbors } ->
     inner = \queue, visited ->
-        current <- List.first queue
+        (current, restOfQueue) <- MinHeap.removeMin queue
             |> Result.mapErr \_ -> NoPathFound
             |> Result.try
 
@@ -120,10 +120,14 @@ aStarSearchDistance = \{ grid, start, goal, initialValue, heuristic, getNeighbor
 
             updatedVisited = Set.insert visited current.coords
             updatedQueue =
-                List.dropFirst queue 1
-                |> List.concat nextNeighbors
-                |> List.sortWith \a, b -> Num.compare a.f b.f
+                List.walk nextNeighbors restOfQueue \buildingQueue, neighbor ->
+                    MinHeap.insert buildingQueue neighbor
 
             inner updatedQueue updatedVisited
 
-    inner [{ coords: start, value: initialValue, g: 0, h: 0, f: 0 }] (Set.empty {})
+    firstCell = { coords: start, value: initialValue, g: 0, h: 0, f: 0 }
+    minFValue = \cellA, cellB ->
+        Num.compare cellA.f cellB.f
+    initialQueue = MinHeap.fromList [firstCell] minFValue
+
+    inner initialQueue (Set.empty {})
