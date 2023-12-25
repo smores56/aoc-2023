@@ -9,12 +9,13 @@ interface Grid
         walk,
         find,
         heightAndWidth,
-        neighbors,
+        allNeighbors,
+        cardinalNeighbors,
         AStarCell,
         AStarNeighbor,
         aStarSearchDistance,
     ]
-    imports [Coordinates]
+    imports [Coordinates, MinHeap]
 
 Grid a : List (List a)
 
@@ -62,44 +63,35 @@ heightAndWidth = \grid ->
 
     (height, width)
 
-neighbors = \grid, coords ->
-    Coordinates.neighbors coords
+allNeighbors = \grid, coords ->
+    Coordinates.allNeighbors coords
     |> List.keepOks \neighbor ->
         get grid neighbor
         |> Result.map \n -> (n, neighbor)
 
-AStarCell a : GridCell
-    {
-        g : Nat,
-        h : Nat,
-        f : Nat,
-    }
-    a
+cardinalNeighbors = \grid, coords ->
+    Coordinates.cardinalNeighbors coords
+    |> List.keepOks \neighbor ->
+        get grid neighbor
+        |> Result.map \n -> (n, neighbor)
 
-AStarNeighbor a : GridCell
-    {
-        distance : Nat,
-    }
-    a
-
-AStarSearchDistanceParams a b : {
-    grid : Grid a,
-    start : GridCell b,
-    goal : Coordinates.Coordinates,
-    heuristic :
-    {
-        grid : Grid a,
-        cell : GridCell b,
-        goal : Coordinates.Coordinates,
-    }
-    -> Nat,
-    getNeighbors : Grid a, GridCell b -> List (AStarNeighbor b),
+AStarCell a : {
+    value : a,
+    coords : Coordinates.Coordinates,
+    g : Nat,
+    h : Nat,
+    f : Nat,
 }
 
-aStarSearchDistance : AStarSearchDistanceParams a b -> Result Nat [NoPathFound] where b implements Bool.Eq & Hash.Hash
-aStarSearchDistance = \{ grid, start, goal, heuristic, getNeighbors } ->
+AStarNeighbor a : {
+    value : a,
+    coords : Coordinates.Coordinates,
+    distance : Nat,
+}
+
+aStarSearchDistance = \{ grid, start, goal, initialValue, heuristic, getNeighbors } ->
     inner = \queue, visited ->
-        current <- List.first queue
+        (current, restOfQueue) <- MinHeap.removeMin queue
             |> Result.mapErr \_ -> NoPathFound
             |> Result.try
 
@@ -121,12 +113,18 @@ aStarSearchDistance = \{ grid, start, goal, heuristic, getNeighbors } ->
                         f: neighborG + neighborH,
                     }
 
-            updatedVisited = Set.insert visited (current.coords, current.value)
+            updatedVisited = Set.insert visited current.coords
             updatedQueue =
-                List.dropFirst queue 1
-                |> List.concat nextNeighbors
-                |> List.sortWith \a, b -> Num.compare a.f b.f
+                List.walk nextNeighbors restOfQueue \buildingQueue, neighbor ->
+                    MinHeap.insert buildingQueue neighbor
 
             inner updatedQueue updatedVisited
 
-    inner [{ coords: start.coords, value: start.value, g: 0, h: 0, f: 0 }] (Set.empty {})
+    # inner [{ coords: start.coords, value: start.value, g: 0, h: 0, f: 0 }] (Set.empty {})
+
+    firstCell = { coords: start, value: initialValue, g: 0, h: 0, f: 0 }
+    minFValue = \cellA, cellB ->
+        Num.compare cellA.f cellB.f
+    initialQueue = MinHeap.fromList [firstCell] minFValue
+
+    inner initialQueue (Set.empty {})
