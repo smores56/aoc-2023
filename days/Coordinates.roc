@@ -2,10 +2,11 @@ interface Coordinates
     exposes [
         Coordinates,
         add,
+        manhattanDistance,
         allNeighbors,
         cardinalNeighbors,
     ]
-    imports []
+    imports [Utils]
 
 Coordinates : {
     row : Nat,
@@ -20,6 +21,12 @@ add = \coords, delta ->
         Ok { row: Num.toNat row, column: Num.toNat column }
     else
         Err OutOfBounds
+
+manhattanDistance = \coordsA, coordsB ->
+    (lowerRow, higherRow) = Utils.lowerAndHigher coordsA.row coordsB.row
+    (lowerColumn, higherColumn) = Utils.lowerAndHigher coordsA.column coordsB.column
+
+    (higherRow - lowerRow) + (higherColumn - lowerColumn)
 
 allNeighbors = \coords ->
     List.keepOks allDeltas \delta ->

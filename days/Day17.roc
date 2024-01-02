@@ -1,6 +1,6 @@
 interface Day17
     exposes [part1, part2]
-    imports [Grid, Utils]
+    imports [AStar, Coordinates, Direction, Grid]
 
 parseCityBlock = \lines ->
     lines
@@ -10,36 +10,51 @@ parseCityBlock = \lines ->
         |> Result.withDefault []
     |> List.dropIf List.isEmpty
 
-getNeighbors = \cityBlock, { coords, value: _value } ->
-    Grid.neighbors cityBlock coords
-    |> List.map \(neighbor, neighborCoords) ->
-        { value: (neighbor, []), coords: neighborCoords, distance: neighbor }
-    |> List.dropIf \neighbor ->
-        List.len neighbor.value.1 > 3
+getNeighbors = \cityBlock, cell ->
+    Direction.allCardinals
+    |> List.dropIf \direction ->
+        direction == cell.value.0
+    |> List.joinMap \direction ->
+        delta = Direction.delta direction
+
+        List.range { start: At 1, end: At 3 }
+            |> List.walkUntil [] \candidates, distance ->
+                lastNeighbor = candidates
+                    |> List.last
+                    |> Result.withDefault { coords: cell.coords, value: cell.value, distance: 0 }
+                nextNeighborCoords = Coordinates.add lastNeighbor.coords delta
+
+                when nextNeighborCoords is
+                    Err _ -> Break candidates
+                    Ok neighborCoords ->
+                        when Grid.get cityBlock neighborCoords is
+                            Err _ -> Break candidates
+                            Ok neighbor ->
+                                newNeighbor = { coords: neighborCoords, value: (direction, distance), distance: lastNeighbor.distance + neighbor }
+                                Continue (candidates |> List.append newNeighbor)
 
 ## The Manhattan distance between two points, multiplied by 9 to emulate
 ## the heat loss that occurs in traversing between neighbors.
-approximateDistance = \{ grid: _cityBlock, cell: { value: _value, coords }, goal } ->
-    (lowerRow, higherRow) = Utils.lowerAndHigher coords.row goal.row
-    (lowerColumn, higherColumn) = Utils.lowerAndHigher coords.column goal.column
-
-    9 * (higherRow - lowerRow + higherColumn - lowerColumn)
+approximateDistance = \{ grid: _cityBlock, cell: { coords, value: _value }, goal } ->
+    Coordinates.manhattanDistance coords goal
 
 part1 = \lines ->
     cityBlock = parseCityBlock lines
     (height, width) = Grid.heightAndWidth cityBlock
 
-    minHeatLoss = Grid.aStarSearchDistance {
+    topLeftCorner = { row: 0, column: 0 }
+    bottomRightCorner = { row: height - 1, column: width - 1 }
+    minHeatLoss = AStar.searchDistance {
         grid: cityBlock,
-        start: { coords: { row: 0, column: 0 }, value: [] },
-        goal: { row: height - 1, column: width - 1 },
+        start: { coords: topLeftCorner, value: (Left, 0) },
+        goal: bottomRightCorner,
         getNeighbors,
         heuristic: approximateDistance,
     }
 
     when minHeatLoss is
         Ok heatLoss -> Num.toStr heatLoss
-        Err err -> "No path to goal found: \(Inspect.toStr err)"
+        Err NoPathFound -> "No path to goal found"
 
 part2 = \_lines ->
     "TODO"

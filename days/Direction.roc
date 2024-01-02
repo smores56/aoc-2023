@@ -1,7 +1,7 @@
 interface Direction
     exposes [
         Direction,
-        allCardinal,
+        allCardinals,
         reverse,
         delta,
     ]
@@ -9,7 +9,7 @@ interface Direction
 
 Direction : [Up, Down, Left, Right]
 
-allCardinal = [Up, Down, Left, Right]
+allCardinals = [Up, Down, Left, Right]
 
 reverse = \direction ->
     when direction is

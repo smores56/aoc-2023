@@ -11,11 +11,8 @@ interface Grid
         heightAndWidth,
         allNeighbors,
         cardinalNeighbors,
-        AStarCell,
-        AStarNeighbor,
-        aStarSearchDistance,
     ]
-    imports [Coordinates, MinHeap]
+    imports [Coordinates]
 
 Grid a : List (List a)
 
@@ -74,57 +71,3 @@ cardinalNeighbors = \grid, coords ->
     |> List.keepOks \neighbor ->
         get grid neighbor
         |> Result.map \n -> (n, neighbor)
-
-AStarCell a : {
-    value : a,
-    coords : Coordinates.Coordinates,
-    g : Nat,
-    h : Nat,
-    f : Nat,
-}
-
-AStarNeighbor a : {
-    value : a,
-    coords : Coordinates.Coordinates,
-    distance : Nat,
-}
-
-aStarSearchDistance = \{ grid, start, goal, initialValue, heuristic, getNeighbors } ->
-    inner = \queue, visited ->
-        (current, restOfQueue) <- MinHeap.removeMin queue
-            |> Result.mapErr \_ -> NoPathFound
-            |> Result.try
-
-        if current.coords == goal then
-            Ok current.g
-        else
-            nextNeighbors =
-                getNeighbors grid { coords: current.coords, value: current.value }
-                |> List.dropIf \neighbor -> Set.contains visited (neighbor.coords, neighbor.value)
-                |> List.map \neighbor ->
-                    neighborG = current.g + neighbor.distance
-                    neighborH = heuristic { grid, cell: { coords: neighbor.coords, value: neighbor.value }, goal }
-
-                    {
-                        value: neighbor.value,
-                        coords: neighbor.coords,
-                        g: neighborG,
-                        h: neighborH,
-                        f: neighborG + neighborH,
-                    }
-
-            updatedVisited = Set.insert visited current.coords
-            updatedQueue =
-                List.walk nextNeighbors restOfQueue \buildingQueue, neighbor ->
-                    MinHeap.insert buildingQueue neighbor
-
-            inner updatedQueue updatedVisited
-
-    # inner [{ coords: start.coords, value: start.value, g: 0, h: 0, f: 0 }] (Set.empty {})
-
-    firstCell = { coords: start, value: initialValue, g: 0, h: 0, f: 0 }
-    minFValue = \cellA, cellB ->
-        Num.compare cellA.f cellB.f
-    initialQueue = MinHeap.fromList [firstCell] minFValue
-
-    inner initialQueue (Set.empty {})
