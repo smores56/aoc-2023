@@ -1,6 +1,7 @@
-interface Day21
-    exposes [part1, part2]
-    imports [Grid]
+module [part1, part2]
+
+import Grid
+import Utils exposing [graphemes]
 
 parseGardens = \lines ->
     lines
@@ -8,7 +9,7 @@ parseGardens = \lines ->
     |> List.walkWithIndex ({ row: 0, column: 0 }, []) \(startingCoords, rows), line, rowIndex ->
         (foundCoords, row) =
             line
-            |> Str.graphemes
+            |> graphemes
             |> List.walkWithIndex (startingCoords, []) \(coords, plots), char, columnIndex ->
                 when char is
                     "S" -> ({ row: rowIndex, column: columnIndex }, List.append plots Garden)

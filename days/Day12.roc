@@ -1,6 +1,6 @@
-interface Day12
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
+
+import Utils exposing [graphemes]
 
 parseSpringChar = \char ->
     when char is
@@ -13,12 +13,12 @@ parseSpringLine = \line ->
     { before, after } <- Str.splitFirst line " "
         |> Result.try
     springs <- before
-        |> Str.graphemes
+        |> graphemes
         |> List.mapTry parseSpringChar
         |> Result.try
     sizes <- after
         |> Str.split ","
-        |> List.mapTry Str.toNat
+        |> List.mapTry Str.toU64
         |> Result.map
 
     { springs, sizes }

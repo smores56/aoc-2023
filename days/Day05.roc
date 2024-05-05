@@ -1,6 +1,6 @@
-interface Day05
-    exposes [part1, part2]
-    imports [Utils]
+module [part1, part2]
+
+import Utils
 
 parseInput = \lines ->
     seeds <- List.get lines 0
@@ -27,7 +27,7 @@ parseSeeds = \line ->
     rest <- Utils.parseLiteral line "seeds: " |> Result.try
 
     Str.split rest " "
-    |> List.mapTry Str.toNat
+    |> List.mapTry Str.toU64
 
 parseMap = \lines ->
     { before: name, after: _ } <- List.get lines 0
@@ -39,7 +39,7 @@ parseMap = \lines ->
     ranges <- List.dropFirst lines 1
         |> List.mapTry \line ->
             nums <- Str.split line " "
-                |> List.mapTry Str.toNat
+                |> List.mapTry Str.toU64
                 |> Result.try
             when nums is
                 [destStart, sourceStart, length] -> Ok { destStart, from: sourceStart, to: sourceStart + length - 1 }

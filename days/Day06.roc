@@ -1,10 +1,10 @@
-interface Day06
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
+
+import Utils exposing [graphemes]
 
 parseNumbers = \chars ->
     (a, b) = List.walk chars ([], NoNum) \(nums, current), char ->
-        when Str.toNat char is
+        when Str.toU64 char is
             Ok digit ->
                 when current is
                     SomeNum n -> (nums, SomeNum (10 * n + digit))
@@ -22,7 +22,7 @@ parseNumbers = \chars ->
 parseRaces = \lines ->
     getNums = \line ->
         line
-        |> Str.graphemes
+        |> graphemes
         |> List.dropFirst 9
         |> parseNumbers
 
@@ -64,10 +64,10 @@ part1 = \lines ->
 
 part2 = \lines ->
     getFullNumber = \line ->
-        Str.graphemes line
+        graphemes line
         |> List.dropFirst 9
         |> List.walk 0 \total, char ->
-            when Str.toNat char is
+            when Str.toU64 char is
                 Ok digit -> 10 * total + digit
                 Err _ -> total
 

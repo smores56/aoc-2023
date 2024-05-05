@@ -1,6 +1,9 @@
-interface Day16
-    exposes [part1, part2]
-    imports [Coordinates, Direction, Grid]
+module [part1, part2]
+
+import Coordinates
+import Direction
+import Grid
+import Utils exposing [graphemes]
 
 # TODO: this runs part 2 in 20 seconds (optimized), that is really inefficient
 
@@ -15,7 +18,7 @@ parseTile = \char ->
 parseTiles = \lines ->
     lines
     |> List.map \line ->
-        Str.graphemes line
+        graphemes line
         |> List.map parseTile
     |> List.dropIf List.isEmpty
 

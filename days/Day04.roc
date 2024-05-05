@@ -1,6 +1,6 @@
-interface Day04
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
+
+import Utils exposing [graphemes]
 
 parseCard = \line ->
     { before: _, after } <- Str.splitFirst line ":" |> Result.try
@@ -8,13 +8,13 @@ parseCard = \line ->
 
     { cardNumbers: parseNumbers cardNumbersStr, myNumbers: parseNumbers myNumbersStr }
 
-parseNumbers : Str -> List Nat
+parseNumbers : Str -> List U64
 parseNumbers = \text ->
     trimmed = Str.trim text
     (allNums, lastNum) =
-        Str.graphemes trimmed
+        graphemes trimmed
         |> List.walk ([], NoNum) \(nums, num), char ->
-            when Str.toNat char is
+            when Str.toU64 char is
                 Ok digit ->
                     when num is
                         SomeNum n -> (nums, SomeNum (10 * n + digit))

@@ -1,6 +1,9 @@
-interface Day10
-    exposes [part1, part2]
-    imports [Grid, Coordinates]
+module [part1, part2]
+
+import Utils exposing [graphemes]
+
+import Grid
+import Coordinates
 
 reverseDirection = \direction ->
     when direction is
@@ -38,7 +41,7 @@ getNeighbor = \pipes, coords, inDirection ->
     { inDirection, coords: neighborCoords, directions: neighborDirections }
 
 parseInput = \lines ->
-    charGrid = List.map lines Str.graphemes
+    charGrid = List.map lines graphemes
     pipes = parsePipes charGrid
 
     when Grid.find charGrid \c -> c == "S" is

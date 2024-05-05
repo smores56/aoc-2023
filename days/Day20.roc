@@ -1,6 +1,6 @@
-interface Day20
-    exposes [part1, part2]
-    imports [Utils]
+module [part1, part2]
+
+import Utils
 
 parseModule = \line ->
     { before, after } <- Str.splitFirst line " -> "

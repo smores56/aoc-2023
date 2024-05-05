@@ -1,8 +1,6 @@
-interface AStar
-    exposes [
-        searchDistance,
-    ]
-    imports [MinHeap]
+module [searchDistance]
+
+import MinHeap
 
 searchDistance = \params ->
     firstCell = { coords: params.start.coords, value: params.start.value, g: 0, h: 0, f: 0 }
@@ -15,7 +13,7 @@ searchDistance = \params ->
 innerSearchDistance = \params, queue, visited ->
     when MinHeap.removeMin queue is
         Err HeapWasEmpty -> Err NoPathFound
-        Ok (current, restOfQueue) if current.coords == params.goal -> Ok current.g
+        Ok (current, _restOfQueue) if current.coords == params.goal -> Ok current.g
         Ok (current, restOfQueue) ->
             nextNeighbors =
                 params.getNeighbors params.grid { coords: current.coords, value: current.value }

@@ -1,18 +1,18 @@
-interface Grid
-    exposes [
-        Grid,
-        GridCell,
-        get,
-        getRow,
-        getColumn,
-        update,
-        walk,
-        find,
-        heightAndWidth,
-        allNeighbors,
-        cardinalNeighbors,
-    ]
-    imports [Coordinates]
+module [
+    Grid,
+    GridCell,
+    get,
+    getRow,
+    getColumn,
+    update,
+    walk,
+    find,
+    heightAndWidth,
+    allNeighbors,
+    cardinalNeighbors,
+]
+
+import Coordinates
 
 Grid a : List (List a)
 

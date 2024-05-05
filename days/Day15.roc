@@ -1,6 +1,4 @@
-interface Day15
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
 
 parseInstruction = \line ->
     if Str.endsWith line "-" then
@@ -9,12 +7,13 @@ parseInstruction = \line ->
         (label, RemoveLens)
     else
         { before: label, after } <- Str.splitFirst line "=" |> Result.try
-        lens <- Str.toNat after |> Result.map
+        lens <- Str.toU64 after |> Result.map
 
         (label, AddLens lens)
 
 hashString = \s ->
-    Str.toScalars s
+    Str.toUtf8 s
+    |> List.map Num.toU64
     |> List.walk 0 \value, c ->
         (value + c) * 17 % 256
 
@@ -43,7 +42,7 @@ totalFocusingPower = \boxes ->
     Dict.toList boxes
     |> List.joinMap \(boxNumber, boxLenses) ->
         List.mapWithIndex boxLenses \(_boxLabel, boxLens), slotNumber ->
-            Num.toNat (boxNumber + 1) * (slotNumber + 1) * boxLens
+            Num.toU64 (boxNumber + 1) * (slotNumber + 1) * boxLens
     |> List.sum
 
 part1 = \lines ->

@@ -1,12 +1,10 @@
-interface MinHeap
-    exposes [
-        MinHeap,
-        withComparator,
-        fromList,
-        insert,
-        removeMin,
-    ]
-    imports []
+module [
+    MinHeap,
+    withComparator,
+    fromList,
+    insert,
+    removeMin,
+]
 
 MinHeap a := {
     items : List a,
@@ -65,7 +63,7 @@ removeMin = \@MinHeap { items, comparator } ->
 
             Ok (item, updatedHeap)
 
-heapify : MinHeap a, Nat -> MinHeap a
+heapify : MinHeap a, U64 -> MinHeap a
 heapify = \@MinHeap { items, comparator }, index ->
     leftChildIndex = 2 * index + 1
     rightChildIndex = 2 * index + 2

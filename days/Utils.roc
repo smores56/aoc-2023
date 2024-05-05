@@ -1,16 +1,30 @@
-interface Utils
-    exposes [dropGraphemes, parseLiteral, parseNat, lowerAndHigher]
-    imports []
+module [
+    graphemes,
+    countGraphemes,
+    dropGraphemes,
+    parseLiteral,
+    parseNat,
+    lowerAndHigher,
+]
+
+graphemes = \s ->
+    Str.toUtf8 s
+    |> List.mapTry \c -> Str.fromUtf8 [c]
+    |> Result.withDefault []
+
+countGraphemes = \s ->
+    Str.toUtf8 s
+    |> List.len
 
 dropGraphemes = \s, amount ->
     s
-    |> Str.graphemes
+    |> graphemes
     |> List.dropFirst amount
     |> Str.joinWith ""
 
 parseLiteral = \text, literal ->
     if Str.startsWith text literal then
-        dropAmount = Str.countGraphemes literal
+        dropAmount = countGraphemes literal
         Ok (dropGraphemes text dropAmount)
     else
         Err ParseError
@@ -18,9 +32,9 @@ parseLiteral = \text, literal ->
 parseNat = \text ->
     digits =
         text
-        |> Str.graphemes
+        |> graphemes
         |> List.walkUntil [] \digitsSoFar, char ->
-            when Str.toNat char is
+            when Str.toU64 char is
                 Ok digit -> Continue (List.append digitsSoFar digit)
                 Err _ -> Break digitsSoFar
 

@@ -1,6 +1,6 @@
-interface Day01
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
+
+import Utils exposing [graphemes]
 
 digitNames = [
     "zero",
@@ -16,7 +16,7 @@ digitNames = [
 ]
 
 firstAndLastNumberOnLine = \line, findDigits ->
-    chars = Str.graphemes line
+    chars = graphemes line
     digits = findDigits chars
 
     firstDigit = List.first digits |> Result.withDefault 0
@@ -29,7 +29,7 @@ digitsWordOrNumber = \chars ->
     List.keepOks startingIndices \index ->
         firstDigit =
             List.get chars index
-            |> Result.try Str.toNat
+            |> Result.try Str.toU64
 
         when firstDigit is
             Ok digit -> Ok digit
@@ -39,7 +39,7 @@ digitsWordOrNumber = \chars ->
 
 part1 = \lines ->
     numbers = List.map lines \line ->
-        findDigits = \chars -> List.keepOks chars Str.toNat
+        findDigits = \chars -> List.keepOks chars Str.toU64
         firstAndLastNumberOnLine line findDigits
 
     Num.toStr (List.sum numbers)

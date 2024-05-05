@@ -1,6 +1,7 @@
-interface Day14
-    exposes [part1, part2]
-    imports [Grid]
+module [part1, part2]
+
+import Grid
+import Utils exposing [graphemes]
 
 parseRock = \char ->
     when char is
@@ -11,7 +12,7 @@ parseRock = \char ->
 
 parseRockGrid = \lines ->
     List.keepOks lines \line ->
-        Str.graphemes line
+        graphemes line
         |> List.mapTry parseRock
     |> List.dropIf List.isEmpty
 

@@ -1,6 +1,6 @@
-interface Day08
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
+
+import Utils exposing [graphemes]
 
 parseInstructions = \lines ->
     turns =
@@ -16,12 +16,12 @@ parseInstructions = \lines ->
     (turns, forks)
 
 parseTurns = \line ->
-    Str.graphemes line
+    graphemes line
     |> List.map \char ->
         if char == "L" then Left else Right
 
 parseFork = \line ->
-    chars = Str.graphemes line
+    chars = graphemes line
     substring = \from, len ->
         List.sublist chars { start: from, len }
         |> Str.joinWith ""

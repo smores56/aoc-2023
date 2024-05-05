@@ -1,6 +1,7 @@
-interface Day13
-    exposes [part1, part2]
-    imports [Grid]
+module [part1, part2]
+
+import Grid
+import Utils exposing [graphemes]
 
 groupGrids = \lines ->
     lines
@@ -19,7 +20,7 @@ groupGrids = \lines ->
     |> List.dropIf List.isEmpty
 
 parsePatternLine = \line ->
-    Str.graphemes line
+    graphemes line
     |> List.map \c ->
         if c == "#" then Rock else Ash
 

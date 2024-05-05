@@ -1,16 +1,16 @@
-interface Coordinates
-    exposes [
-        Coordinates,
-        add,
-        manhattanDistance,
-        allNeighbors,
-        cardinalNeighbors,
-    ]
-    imports [Utils]
+module [
+    Coordinates,
+    add,
+    manhattanDistance,
+    allNeighbors,
+    cardinalNeighbors,
+]
+
+import Utils
 
 Coordinates : {
-    row : Nat,
-    column : Nat,
+    row : U64,
+    column : U64,
 }
 
 add = \coords, delta ->
@@ -18,7 +18,7 @@ add = \coords, delta ->
     column = delta.column + Num.toI64 coords.column
 
     if row >= 0 && column >= 0 then
-        Ok { row: Num.toNat row, column: Num.toNat column }
+        Ok { row: Num.toU64 row, column: Num.toU64 column }
     else
         Err OutOfBounds
 

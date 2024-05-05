@@ -1,9 +1,10 @@
-interface Day03
-    exposes [part1, part2]
-    imports [Grid]
+module [part1, part2]
+
+import Grid
+import Utils exposing [graphemes]
 
 parseSchematicChar = \char ->
-    when Str.toNat char is
+    when Str.toU64 char is
         Ok num -> Digit num
         Err _ ->
             if char == "." then
@@ -37,7 +38,7 @@ parseSchematic = \grid ->
 
 part1 = \lines ->
     grid = List.map lines \line ->
-        List.map (Str.graphemes line) parseSchematicChar
+        List.map (graphemes line) parseSchematicChar
     schematic = parseSchematic grid
 
     allSymbolCoords =
@@ -63,7 +64,7 @@ part1 = \lines ->
 
 part2 = \lines ->
     grid = List.map lines \line ->
-        List.map (Str.graphemes line) parseSchematicChar
+        List.map (graphemes line) parseSchematicChar
     schematic = parseSchematic grid
 
     allGearCandidates =

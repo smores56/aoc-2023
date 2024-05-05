@@ -1,42 +1,42 @@
-app "aoc-2023"
-    packages { days: "days/main.roc", pf: "https://github.com/roc-lang/basic-cli/releases/download/0.7.0/bkGby8jb0tmZYsy2hg1E_B2QrCgcSTxdUlHtETwm5m4.tar.br" }
-    imports [
-        pf.Stdout,
-        pf.Stderr,
-        pf.File,
-        pf.Http,
-        pf.Task,
-        pf.Path,
-        pf.Dir,
-        pf.Arg,
-        pf.Utc,
-        days.Day01,
-        days.Day02,
-        days.Day03,
-        days.Day04,
-        days.Day05,
-        days.Day06,
-        days.Day07,
-        days.Day08,
-        days.Day09,
-        days.Day10,
-        days.Day11,
-        days.Day12,
-        days.Day13,
-        days.Day14,
-        days.Day15,
-        days.Day16,
-        days.Day17,
-        days.Day18,
-        days.Day19,
-        days.Day20,
-        days.Day21,
-        days.Day22,
-        days.Day23,
-        days.Day24,
-        days.Day25,
-    ]
-    provides [main] to pf
+app [main] {
+    days: "days/main.roc",
+    pf: platform "https://github.com/roc-lang/basic-cli/releases/download/0.10.0/vNe6s9hWzoTZtFmNkvEICPErI9ptji_ySjicO6CkucY.tar.br",
+}
+
+import pf.Stdout
+import pf.Stderr
+import pf.File
+import pf.Http
+import pf.Task
+import pf.Path
+import pf.Dir
+import pf.Arg
+import pf.Utc
+import days.Day01
+import days.Day02
+import days.Day03
+import days.Day04
+import days.Day05
+import days.Day06
+import days.Day07
+import days.Day08
+import days.Day09
+import days.Day10
+import days.Day11
+import days.Day12
+import days.Day13
+import days.Day14
+import days.Day15
+import days.Day16
+import days.Day17
+import days.Day18
+import days.Day19
+import days.Day20
+import days.Day21
+import days.Day22
+import days.Day23
+import days.Day24
+import days.Day25
 
 aocYear = 2023
 
@@ -55,7 +55,8 @@ main =
             FailedToCacheInput -> "Failed to save loaded input to cache"
             FailedToCreateCacheDir -> "Failed to create \(inputCacheDir) cache directory"
             FailedToFetchInput httpErr ->
-                "Failed to fetch input from the Advent of Code site: \(Http.errorToString httpErr)"
+                "Failed to fetch input from the Advent of Code site: \(Inspect.toStr httpErr)"
+            other -> "Unknown error occurred: $(Inspect.toStr other)"
 
     Stderr.line message
 
@@ -115,7 +116,7 @@ getDayFromArgs =
     result =
         args
         |> List.get 1
-        |> Result.try Str.toNat
+        |> Result.try Str.toU64
 
     when result is
         Ok day -> Task.ok day
@@ -144,11 +145,14 @@ fetchInputFromInternet = \day ->
     url = "https://adventofcode.com/\(Num.toStr aocYear)/day/\(Num.toStr day)/input"
     cookieHeader = Http.header "Cookie" "session=\(sessionToken)"
     request = { Http.defaultRequest & url, headers: [cookieHeader] }
-    response <- Http.send request
-        |> Task.mapErr FailedToFetchInput
-        |> Task.await
+    response = Http.send request
+        |> Task.mapErr! FailedToFetchInput
 
-    response |> Str.split "\n" |> Task.ok
+    response.body
+    |> Str.fromUtf8
+    |> Result.withDefault ""
+    |> Str.split "\n"
+    |> Task.ok
 
 loadInputFromCache = \day ->
     data <- File.readUtf8 (inputCachePath day)

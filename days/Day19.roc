@@ -1,6 +1,7 @@
-interface Day19
-    exposes [part1, part2]
-    imports [Utils, Range]
+module [part1, part2]
+
+import Range
+import Utils exposing [graphemes]
 
 Category : [X, M, A, S]
 
@@ -17,7 +18,7 @@ Destination : [Accept, Reject, GoToWorkflow Str]
 
 parseDestination : Str -> Destination
 parseDestination = \line ->
-    chars = Str.graphemes line
+    chars = graphemes line
     when List.first chars is
         Ok "A" -> Accept
         Ok "R" -> Reject
@@ -38,14 +39,14 @@ WorkflowStep : [
         {
             category : Category,
             comparison : Comparison,
-            limit : Nat,
+            limit : U64,
             destination : Destination,
         },
 ]
 
 parseWorkflowStep : Str -> Result WorkflowStep [InvalidCategory, InvalidNumStr, ListWasEmpty, NotFound]
 parseWorkflowStep = \line ->
-    chars = Str.graphemes line
+    chars = graphemes line
     comparisonResult =
         List.get chars 1
         |> Result.try parseComparison
@@ -60,7 +61,7 @@ parseWorkflowStep = \line ->
                 |> Utils.dropGraphemes 2
                 |> Str.splitFirst ":"
                 |> Result.try
-            limit <- Str.toNat before
+            limit <- Str.toU64 before
                 |> Result.map
             destination = parseDestination after
 
@@ -80,10 +81,10 @@ parseWorkflow = \line ->
 
     (name, steps)
 
-parseRating : Str -> Result (Dict Category Nat) [InvalidCategory, InvalidNumStr, NotFound]
+parseRating : Str -> Result (Dict Category U64) [InvalidCategory, InvalidNumStr, NotFound]
 parseRating = \line ->
     withoutBrackets =
-        Str.graphemes line
+        graphemes line
         |> List.dropFirst 1
         |> List.dropLast 1
         |> Str.joinWith ""
@@ -93,7 +94,7 @@ parseRating = \line ->
                 |> Result.try
             category <- parseCategory before
                 |> Result.try
-            amount <- Str.toNat after
+            amount <- Str.toU64 after
                 |> Result.map
 
             (category, amount)
@@ -101,7 +102,7 @@ parseRating = \line ->
 
     Dict.fromList groups
 
-parseInput : List Str -> Result { workflows : Dict Str (List WorkflowStep), ratings : List (Dict Category Nat) } [WorkflowIssue [NotFound, InvalidCategory, InvalidNumStr, ListWasEmpty], RatingIssue [InvalidCategory, InvalidNumStr, NotFound]]
+parseInput : List Str -> Result { workflows : Dict Str (List WorkflowStep), ratings : List (Dict Category U64) } [WorkflowIssue [NotFound, InvalidCategory, InvalidNumStr, ListWasEmpty], RatingIssue [InvalidCategory, InvalidNumStr, NotFound]]
 parseInput = \lines ->
     emptyLineIndex =
         List.findFirstIndex lines Str.isEmpty

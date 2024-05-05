@@ -1,6 +1,9 @@
-interface Day23
-    exposes [part1, part2]
-    imports [Coordinates, Direction, Grid]
+module [part1, part2]
+
+import Coordinates
+import Direction
+import Grid
+import Utils exposing [graphemes]
 
 parseSlope = \char ->
     when char is
@@ -24,7 +27,7 @@ parseForest = \lines ->
     |> List.dropIf Str.isEmpty
     |> List.map \line ->
         line
-        |> Str.graphemes
+        |> graphemes
         |> List.map parseCell
 
 findStartAndEndCoords = \forest ->
@@ -156,11 +159,11 @@ part1 = \lines ->
 
 part2 = \lines ->
     forest = parseForest lines
-        # |> List.map \row ->
-        #     List.map row \cell ->
-        #         when cell is
-        #             Tree -> Tree
-        #             _other -> Path
+    # |> List.map \row ->
+    #     List.map row \cell ->
+    #         when cell is
+    #             Tree -> Tree
+    #             _other -> Path
 
     (startCoords, endCoords) =
         when findStartAndEndCoords forest is

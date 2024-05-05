@@ -1,12 +1,16 @@
-interface Day17
-    exposes [part1, part2]
-    imports [AStar, Coordinates, Direction, Grid]
+module [part1, part2]
+
+import AStar
+import Coordinates
+import Direction
+import Grid
+import Utils exposing [graphemes]
 
 parseCityBlock = \lines ->
     lines
     |> List.map \line ->
-        Str.graphemes line
-        |> List.mapTry Str.toNat
+        graphemes line
+        |> List.mapTry Str.toU64
         |> Result.withDefault []
     |> List.dropIf List.isEmpty
 
@@ -18,20 +22,21 @@ getNeighbors = \cityBlock, cell ->
         delta = Direction.delta direction
 
         List.range { start: At 1, end: At 3 }
-            |> List.walkUntil [] \candidates, distance ->
-                lastNeighbor = candidates
-                    |> List.last
-                    |> Result.withDefault { coords: cell.coords, value: cell.value, distance: 0 }
-                nextNeighborCoords = Coordinates.add lastNeighbor.coords delta
+        |> List.walkUntil [] \candidates, distance ->
+            lastNeighbor =
+                candidates
+                |> List.last
+                |> Result.withDefault { coords: cell.coords, value: cell.value, distance: 0 }
+            nextNeighborCoords = Coordinates.add lastNeighbor.coords delta
 
-                when nextNeighborCoords is
-                    Err _ -> Break candidates
-                    Ok neighborCoords ->
-                        when Grid.get cityBlock neighborCoords is
-                            Err _ -> Break candidates
-                            Ok neighbor ->
-                                newNeighbor = { coords: neighborCoords, value: (direction, distance), distance: lastNeighbor.distance + neighbor }
-                                Continue (candidates |> List.append newNeighbor)
+            when nextNeighborCoords is
+                Err _ -> Break candidates
+                Ok neighborCoords ->
+                    when Grid.get cityBlock neighborCoords is
+                        Err _ -> Break candidates
+                        Ok neighbor ->
+                            newNeighbor = { coords: neighborCoords, value: (direction, distance), distance: lastNeighbor.distance + neighbor }
+                            Continue (candidates |> List.append newNeighbor)
 
 ## The Manhattan distance between two points, multiplied by 9 to emulate
 ## the heat loss that occurs in traversing between neighbors.

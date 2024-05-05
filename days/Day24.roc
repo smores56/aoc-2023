@@ -1,55 +1,53 @@
-interface Day24
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
 
-parseCoordinates = \line ->
-    parsingResult = 
-        line
-        |> Str.split ","
-        |> List.map Str.trim
-        |> List.mapTry Str.toF64
+# parseCoordinates = \line ->
+#     parsingResult =
+#         line
+#         |> Str.split ","
+#         |> List.map Str.trim
+#         |> List.mapTry Str.toF64
 
-    when parsingResult is
-        Ok ([x, y, z]) -> Ok { x, y, z }
-        _ -> Err InvalidCoordinates
+#     when parsingResult is
+#         Ok [x, y, z] -> Ok { x, y, z }
+#         _ -> Err InvalidCoordinates
 
-parseHail = \line ->
-    { before, after } <- Str.splitFirst line " @ "
-        |> Result.try
-    position <- parseCoordinates before
-        |> Result.try
-    velocity <- parseCoordinates after
-        |> Result.map
+# parseHail = \line ->
+#     { before, after } <- Str.splitFirst line " @ "
+#         |> Result.try
+#     position <- parseCoordinates before
+#         |> Result.try
+#     velocity <- parseCoordinates after
+#         |> Result.map
 
-    { position, velocity }
+#     { position, velocity }
 
-addCoords = \a, b ->
-    { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }
+# addCoords = \a, b ->
+#     { x: a.x + b.x, y: a.y + b.y, z: a.z + b.z }
 
 ## Point of Intersection (x, y) = ((b1×c2 − b2×c1)/(a1×b2 − a2×b1), (c1×a2 − c2×a1)/(a1×b2 − a2×b1))
-intersectionOfTwoHailstonesXY = \hail1, hail2 ->
-    coeff1 <- coefficientsOfLineFromHail hail1
-        |> Result.try
-    coeff2 <- coefficientsOfLineFromHail hail2
-        |> Result.try
+# intersectionOfTwoHailstonesXY = \hail1, hail2 ->
+#     coeff1 <- coefficientsOfLineFromHail hail1
+#         |> Result.try
+#     coeff2 <- coefficientsOfLineFromHail hail2
+#         |> Result.try
 
-    x <- (coeff1.b * coeff2.c - coeff2.b * coeff1.c)
-        |> Num.divChecked (coeff1.a * coeff2.b - coeff2.a * coeff1.b)
-        |> Result.try
-    y <- (coeff1.b * coeff2.c - coeff2.b * coeff1.c)
-        |> Num.divChecked (coeff1.a * coeff2.b - coeff2.a * coeff1.b)
-        |> Result.map
+#     x <- (coeff1.b * coeff2.c - coeff2.b * coeff1.c)
+#         |> Num.divChecked (coeff1.a * coeff2.b - coeff2.a * coeff1.b)
+#         |> Result.try
+#     y <- (coeff1.b * coeff2.c - coeff2.b * coeff1.c)
+#         |> Num.divChecked (coeff1.a * coeff2.b - coeff2.a * coeff1.b)
+#         |> Result.map
 
-    { x, y }
+#     { x, y }
 
-coefficientsOfLineFromHail = \hail ->
-    a = hail.position
-    b = addCoords hail.position hail.velocity
-    slope <- Num.divChecked (b.y - a.y) (b.x - a.x)
-        |> Result.map
-    intercept = a.y - slope * a.x
+# coefficientsOfLineFromHail = \hail ->
+#     a = hail.position
+#     b = addCoords hail.position hail.velocity
+#     slope <- Num.divChecked (b.y - a.y) (b.x - a.x)
+#         |> Result.map
+#     intercept = a.y - slope * a.x
 
-    { a: slope, b: -1.0, c: intercept }
+#     { a: slope, b: -1.0, c: intercept }
 
 part1 = \_lines ->
     # maxX = 200_000_000_000_000.0

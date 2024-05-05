@@ -1,6 +1,6 @@
-interface Day02
-    exposes [part1, part2]
-    imports [Utils.{ parseLiteral, parseNat }]
+module [part1, part2]
+
+import Utils exposing [parseLiteral, parseNat]
 
 emptyHand = { red: 0, green: 0, blue: 0 }
 

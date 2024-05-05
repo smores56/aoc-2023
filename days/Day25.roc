@@ -1,6 +1,4 @@
-interface Day25
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
 
 part1 = \_lines ->
     "TODO"

@@ -1,3 +1,1 @@
-package "Days"
-    exposes []
-    packages {}
+package [] {}

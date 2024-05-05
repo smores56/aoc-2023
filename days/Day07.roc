@@ -1,9 +1,9 @@
-interface Day07
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
+
+import Utils exposing [graphemes]
 
 parseCard = \char, jType ->
-    when Str.toNat char is
+    when Str.toU64 char is
         Ok digit -> Ok digit
         Err _ ->
             when char is
@@ -24,13 +24,13 @@ parseHand = \line, jType ->
         |> Result.try
 
     cards <- before
-        |> Str.graphemes
+        |> graphemes
         |> List.mapTry \char -> parseCard char jType
         |> Result.try
 
     bid <- after
         |> Str.trim
-        |> Str.toNat
+        |> Str.toU64
         |> Result.map
 
     { cards, bid }

@@ -1,11 +1,11 @@
-interface Day22
-    exposes [part1, part2]
-    imports [Utils]
+module [part1, part2]
+
+import Utils
 
 Block : {
-    x : Nat,
-    y : Nat,
-    z : Nat,
+    x : U64,
+    y : U64,
+    z : U64,
 }
 
 parseBrickEnds : Str -> Result { start : Block, end : Block } [InvalidCoordinates, NotFound]
@@ -23,7 +23,7 @@ parseCoordinates : Str -> Result Block [InvalidCoordinates]
 parseCoordinates = \line ->
     parseResult = line
         |> Str.split ","
-        |> List.mapTry Str.toNat
+        |> List.mapTry Str.toU64
 
     when parseResult is
         Ok ([x, y, z]) -> Ok { x, y, z }
@@ -54,14 +54,14 @@ brickFromEnds = \{ start, end } ->
     else
         { blocks: [start], supportedBy: Set.empty {} }
 
-brickZ : Brick, [Top, Bottom] -> Nat
+brickZ : Brick, [Top, Bottom] -> U64
 brickZ = \brick, side ->
     zCoords = List.map brick.blocks .z
     when side is
         Top -> List.max zCoords |> Result.withDefault 0
         Bottom -> List.min zCoords |> Result.withDefault 0
 
-brickFootprint : Brick, [Top, Bottom] -> (Nat, List Block)
+brickFootprint : Brick, [Top, Bottom] -> (U64, List Block)
 brickFootprint = \brick, side ->
     zOfSide = brickZ brick side
     (zOfSide, brick.blocks |> List.keepIf \b -> b.z == zOfSide)

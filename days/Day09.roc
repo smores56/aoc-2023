@@ -1,6 +1,4 @@
-interface Day09
-    exposes [part1, part2]
-    imports []
+module [part1, part2]
 
 parseHistory = \line ->
     line

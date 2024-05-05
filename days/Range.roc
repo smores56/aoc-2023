@@ -1,11 +1,9 @@
-interface Range
-    exposes [
-        Range,
-        len,
-        contains,
-        combineAll,
-    ]
-    imports []
+module [
+    Range,
+    len,
+    contains,
+    combineAll,
+]
 
 Range a : {
     start : Num a,

@@ -1,9 +1,10 @@
-interface Day11
-    exposes [part1, part2]
-    imports [Grid, Utils]
+module [part1, part2]
+
+import Grid
+import Utils exposing [graphemes]
 
 parseGalaxies = \lines ->
-    charGrid = List.map lines Str.graphemes
+    charGrid = List.map lines graphemes
     Grid.walk charGrid [] \galaxiesSoFar, char, coords ->
         if char == "#" then
             galaxiesSoFar |> List.append coords
@@ -22,7 +23,7 @@ emptyRowsAndColumns = \galaxies ->
     { emptyRows, emptyColumns }
 
 galaxyBounds = \galaxies ->
-    inf = Num.toNat Num.maxU32
+    inf = Num.toU64 Num.maxU32
     baseBounds = { minRow: inf, maxRow: 0, minColumn: inf, maxColumn: 0 }
 
     List.walk galaxies baseBounds \bounds, galaxy -> {

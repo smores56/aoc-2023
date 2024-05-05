@@ -1,11 +1,9 @@
-interface Direction
-    exposes [
-        Direction,
-        allCardinals,
-        reverse,
-        delta,
-    ]
-    imports []
+module [
+    Direction,
+    allCardinals,
+    reverse,
+    delta,
+]
 
 Direction : [Up, Down, Left, Right]
 
